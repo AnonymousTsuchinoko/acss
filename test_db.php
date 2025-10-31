@@ -1,6 +1,6 @@
 <?php
 // Use forward slashes for Windows paths
-$rootPath = 'C:/Users/LENOVO/Desktop/acss-1';
+$rootPath = dirname(__DIR__);
 
 require $rootPath . '/vendor/autoload.php';
 
