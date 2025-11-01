@@ -343,42 +343,42 @@ ob_start();
                             <label class="text-sm font-medium text-gray-600">Designation</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-id-badge text-green-500 mr-2"></i>
-                                <?php echo htmlspecialchars($user['designation'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['designation'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-600">Advisory Class</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-chalkboard-teacher text-pink-500 mr-2"></i>
-                                <?php echo htmlspecialchars($user['advisory_class'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['advisory_class'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-600">Bachelor's Degree</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-scroll text-indigo-500 mr-2"></i>
-                                <?php echo htmlspecialchars($user['bachelor_degree'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['bachelor_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-600">Master's Degree</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-award text-orange-500 mr-2"></i>
-                                <?php echo htmlspecialchars($user['master_degree'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['master_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-600">Doctorate Degree</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-university text-gray-400"></i>
-                                <?php echo htmlspecialchars($user['doctorate_degree'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['doctorate_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-600">Post-Doctorate Degree</label>
                             <p class="mt-1 text-gray-800 font-medium flex items-center">
                                 <i class="fas fa-medal text-teal-500 mr-2"></i>
-                                <?php echo htmlspecialchars($user['post_doctorate_degree'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo htmlspecialchars($user['post_doctorate_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </p>
                         </div>
                     </div>
@@ -409,6 +409,14 @@ ob_start();
                                             </span>
                                         </div>
                                         <div class="flex space-x-1">
+                                            <form method="POST" action="/chair/profile" style="display:inline;" class="edit-form" data-index="<?php echo $index; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                                                <input type="hidden" name="action" value="edit_specialization">
+                                                <input type="hidden" name="specialization_index" value="<?php echo $index; ?>">
+                                                <button type="submit" class="text-gray-400 hover:text-blue-500 transition-colors" title="Edit">
+                                                    <i class="fas fa-edit text-sm"></i>
+                                                </button>
+                                            </form>
                                             <button type="button" class="remove-specialization-btn text-gray-400 hover:text-red-500 transition-colors" data-course-id="<?php echo htmlspecialchars($specialization['course_id'], ENT_QUOTES, 'UTF-8'); ?>" title="Remove">
                                                 <i class="fas fa-trash text-sm"></i>
                                             </button>
@@ -427,6 +435,46 @@ ob_start();
                                 </button>
                             </div>
                         <?php endif; ?>
+                    </div>
+
+                    <!-- Edit Specialization Modal (unchanged) -->
+                    <div id="editSpecializationModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 transform modal-content scale-95">
+                            <div class="bg-yellow-600 text-white p-6 rounded-t-xl flex items-center justify-between">
+                                <h3 class="text-xl font-bold flex items-center">
+                                    <i class="fas fa-edit mr-2"></i>
+                                    Edit Subject Specialization
+                                </h3>
+                                <button id="closeEditSpecializationModalBtn" class="text-white hover:text-yellow-200 focus:outline-none bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full h-8 w-8 flex items-center justify-center transition-all duration-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form method="POST" action="/chair/profile/" class="p-6">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                                <input type="hidden" name="action" value="update_specialization">
+                                <input type="hidden" name="course_id" id="edit_course_id" value="">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="edit_expertise_level" class="block text-sm font-medium text-gray-700 mb-1">Expertise Level</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fas fa-star text-gray-400"></i>
+                                            </div>
+                                            <select id="edit_expertise_level" name="expertise_level" class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus" required>
+                                                <option value="">Select Level</option>
+                                                <option value="Beginner">Beginner</option>
+                                                <option value="Intermediate">Intermediate</option>
+                                                <option value="Expert">Expert</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                                    <button type="button" id="cancelEditSpecializationBtn" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300 transition-all duration-200 font-medium">Cancel</button>
+                                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-3 rounded-lg shadow-md transition-all duration-200 font-medium">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Remove Confirmation Modal -->
@@ -727,7 +775,7 @@ ob_start();
                                             <i class="fas fa-user-graduate text-gray-400"></i>
                                         </div>
                                         <input type="text" id="bachelor_degree" name="bachelor_degree"
-                                            value="<?php echo htmlspecialchars($user['bachelor_degree'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['bachelor_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -739,7 +787,7 @@ ob_start();
                                             <i class="fas fa-graduation-cap text-gray-400"></i>
                                         </div>
                                         <input type="text" id="master_degree" name="master_degree"
-                                            value="<?php echo htmlspecialchars($user['master_degree'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['master_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -751,7 +799,7 @@ ob_start();
                                             <i class="fas fa-university text-gray-400"></i>
                                         </div>
                                         <input type="text" id="doctorate_degree" name="doctorate_degree"
-                                            value="<?php echo htmlspecialchars($user['doctorate_degree'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['doctorate_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -763,7 +811,7 @@ ob_start();
                                             <i class="fas fa-user-tie text-gray-400"></i>
                                         </div>
                                         <input type="text" id="post_doctorate_degree" name="post_doctorate_degree"
-                                            value="<?php echo htmlspecialchars($user['post_doctorate_degree'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['post_doctorate_degree'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -775,7 +823,7 @@ ob_start();
                                             <i class="fas fa-briefcase text-gray-400"></i>
                                         </div>
                                         <input type="text" id="designation" name="designation"
-                                            value="<?php echo htmlspecialchars($user['designation'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['designation'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -787,7 +835,7 @@ ob_start();
                                             <i class="fas fa-chalkboard-teacher text-gray-400"></i>
                                         </div>
                                         <input type="text" id="advisory_class" name="advisory_class"
-                                            value="<?php echo htmlspecialchars($user['advisory_class'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            value="<?php echo htmlspecialchars($user['advisory_class'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                             class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 bg-white shadow-sm input-focus">
                                     </div>
                                 </div>
@@ -910,6 +958,32 @@ ob_start();
                 }
             }
 
+            // Edit Specialization Modal Functions
+            function openEditSpecializationModal(courseId, currentLevel) {
+                const modal = document.getElementById('editSpecializationModal');
+                const modalContent = modal?.querySelector('.modal-content');
+                if (modal && modalContent) {
+                    document.getElementById('edit_course_id').value = courseId;
+                    const levelSelect = document.getElementById('edit_expertise_level');
+                    levelSelect.value = currentLevel || '';
+                    modal.classList.remove('hidden');
+                    setTimeout(() => modalContent.classList.add('scale-100'), 50);
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeEditSpecializationModal() {
+                const modal = document.getElementById('editSpecializationModal');
+                const modalContent = modal?.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-100');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }, 300);
+                }
+            }
+
             // Remove Specialization Modal Functions
             function openRemoveSpecializationModal(courseId) {
                 const modal = document.getElementById('removeSpecializationModal');
@@ -984,6 +1058,29 @@ ob_start();
             const cancelSpecializationBtn = document.getElementById('cancelSpecializationBtn');
             if (cancelSpecializationBtn) cancelSpecializationBtn.addEventListener('click', closeSpecializationModal);
 
+            // Edit specialization modal event listeners
+            const closeEditSpecializationModalBtn = document.getElementById('closeEditSpecializationModalBtn');
+            if (closeEditSpecializationModalBtn) closeEditSpecializationModalBtn.addEventListener('click', closeEditSpecializationModal);
+
+            const cancelEditSpecializationBtn = document.getElementById('cancelEditSpecializationBtn');
+            if (cancelEditSpecializationBtn) cancelEditSpecializationBtn.addEventListener('click', closeEditSpecializationModal);
+
+            // Replace the edit form event listener
+            document.querySelectorAll('.edit-form').forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const index = form.querySelector('input[name="specialization_index"]').value;
+                    const specializations = <?php echo json_encode(array_values($specializations)); ?>;
+                    if (specializations[index]) {
+                        openEditSpecializationModal(specializations[index].course_id, specializations[index].level);
+                    } else {
+                        console.log('Specialization not found for index:', index);
+                    }
+                });
+            });
+
+            // Handle remove confirmation (already in HTML with onsubmit)
+
             // Close modals when clicking outside
             const editProfileModal = document.getElementById('editProfileModal');
             if (editProfileModal) {
@@ -999,6 +1096,13 @@ ob_start();
                 });
             }
 
+            const editSpecializationModal = document.getElementById('editSpecializationModal');
+            if (editSpecializationModal) {
+                editSpecializationModal.addEventListener('click', (e) => {
+                    if (e.target === editSpecializationModal) closeEditSpecializationModal();
+                });
+            }
+
             // Close modals with Escape key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
@@ -1007,6 +1111,9 @@ ob_start();
                     }
                     if (addSpecializationModal && !addSpecializationModal.classList.contains('hidden')) {
                         closeSpecializationModal();
+                    }
+                    if (editSpecializationModal && !editSpecializationModal.classList.contains('hidden')) {
+                        closeEditSpecializationModal();
                     }
                 }
             });

@@ -50,20 +50,11 @@ class AdminController
             $scheduleCount = $this->db->query("SELECT COUNT(*) FROM schedules")->fetchColumn();
 
             // Get user role distribution
-            $roleStmt = $this->db->query("
-        SELECT r.role_name, COUNT(u.user_id) as count 
-        FROM users u 
-        JOIN roles r ON u.role_id = r.role_id 
-        GROUP BY r.role_name
-        ");
+            $roleStmt = $this->db->query("\n        SELECT r.role_name, COUNT(u.user_id) as count \n        FROM users u \n        JOIN roles r ON u.role_id = r.role_id \n        GROUP BY r.role_name\n        ");
             $roleDistribution = $roleStmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Get schedule status distribution
-            $scheduleStmt = $this->db->query("
-        SELECT status, COUNT(*) as count 
-        FROM schedules 
-        GROUP BY status
-        ");
+            $scheduleStmt = $this->db->query("\n        SELECT status, COUNT(*) as count \n        FROM schedules \n        GROUP BY status\n        ");
             $scheduleDistribution = $scheduleStmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Fetch current semester (your existing code)
@@ -84,8 +75,9 @@ class AdminController
             require_once __DIR__ . '/../views/admin/dashboard.php';
         } catch (PDOException $e) {
             error_log("Dashboard error: " . $e->getMessage());
-            http_response_code(500);
-            echo "Server error";
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'A database error occurred.'];
+            header('Location: /admin/dashboard');
+            exit;
         }
     }
 
@@ -985,11 +977,55 @@ class AdminController
         }
     }
 
+    private function validateDepartmentData($department_name, $college_id, $program_name, $program_code)
+    {
+        if (empty($department_name) || empty($college_id) || empty($program_name) || empty($program_code)) {
+            return "Department name, college, program name, and program code are required";
+        }
+
+        // Check for duplicate department
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM departments WHERE department_name = :department_name AND college_id = :college_id");
+        $stmt->execute([':department_name' => $department_name, ':college_id' => $college_id]);
+        if ($stmt->fetchColumn() > 0) {
+            return "Department already exists in this college";
+        }
+
+        // Check for duplicate program code
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM programs WHERE program_code = :program_code");
+        $stmt->execute([':program_code' => $program_code]);
+        if ($stmt->fetchColumn() > 0) {
+            return "Program code already exists";
+        }
+
+        return null;
+    }
+
+    private function validateCollegeData($college_name, $college_code)
+    {
+        if (empty($college_name) || empty($college_code)) {
+            return "College name and code are required";
+        }
+
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM colleges WHERE college_code = :college_code");
+        $stmt->execute([':college_code' => $college_code]);
+        if ($stmt->fetchColumn() > 0) {
+            return "College code already exists";
+        }
+
+        return null;
+    }
+
     public function createCollegeDepartment()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo "Method Not Allowed";
+            exit;
+        }
+
+        if (!$this->authService->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invalid CSRF token'];
+            header('Location: /admin/colleges_departments');
             exit;
         }
 
@@ -999,17 +1035,9 @@ class AdminController
                 $college_name = trim($_POST['college_name'] ?? '');
                 $college_code = trim($_POST['college_code'] ?? '');
 
-                if (empty($college_name) || empty($college_code)) {
-                    $_SESSION['error'] = "College name and code are required";
-                    header('Location: /admin/colleges_departments'); // CHANGED
-                    exit;
-                }
-
-                $stmt = $this->db->prepare("SELECT COUNT(*) FROM colleges WHERE college_code = :college_code");
-                $stmt->execute([':college_code' => $college_code]);
-                if ($stmt->fetchColumn() > 0) {
-                    $_SESSION['error'] = "College code already exists";
-                    header('Location: /admin/colleges_departments'); // CHANGED
+                if ($error = $this->validateCollegeData($college_name, $college_code)) {
+                    $_SESSION['error'] = $error;
+                    header('Location: /admin/colleges_departments');
                     exit;
                 }
 
@@ -1030,27 +1058,9 @@ class AdminController
                 $program_code = trim($_POST['program_code'] ?? '');
                 $program_type = $_POST['program_type'] ?? 'Major';
 
-                if (empty($department_name) || empty($college_id) || empty($program_name) || empty($program_code)) {
-                    $_SESSION['error'] = "Department name, college, program name, and program code are required";
-                    header('Location: /admin/colleges_departments'); // CHANGED
-                    exit;
-                }
-
-                // Check for duplicate department
-                $stmt = $this->db->prepare("SELECT COUNT(*) FROM departments WHERE department_name = :department_name AND college_id = :college_id");
-                $stmt->execute([':department_name' => $department_name, ':college_id' => $college_id]);
-                if ($stmt->fetchColumn() > 0) {
-                    $_SESSION['error'] = "Department already exists in this college";
-                    header('Location: /admin/colleges_departments'); // CHANGED
-                    exit;
-                }
-
-                // Check for duplicate program code
-                $stmt = $this->db->prepare("SELECT COUNT(*) FROM programs WHERE program_code = :program_code");
-                $stmt->execute([':program_code' => $program_code]);
-                if ($stmt->fetchColumn() > 0) {
-                    $_SESSION['error'] = "Program code already exists";
-                    header('Location: /admin/colleges_departments'); // CHANGED
+                if ($error = $this->validateDepartmentData($department_name, $college_id, $program_name, $program_code)) {
+                    $_SESSION['error'] = $error;
+                    header('Location: /admin/colleges_departments');
                     exit;
                 }
 
@@ -1085,17 +1095,17 @@ class AdminController
                 $_SESSION['success'] = "Department and associated program created successfully";
             } else {
                 $_SESSION['error'] = "Invalid request type";
-                header('Location: /admin/colleges_departments'); // CHANGED
+                header('Location: /admin/colleges_departments');
                 exit;
             }
 
-            header('Location: /admin/colleges_departments'); // CHANGED
+            header('Location: /admin/colleges_departments');
             exit;
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("Create college/department error: " . $e->getMessage());
             $_SESSION['error'] = "Failed to create $type";
-            header('Location: /admin/colleges_departments'); // CHANGED
+            header('Location: /admin/colleges_departments');
             exit;
         }
     }
@@ -1108,13 +1118,19 @@ class AdminController
             exit;
         }
 
+        if (!$this->authService->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invalid CSRF token'];
+            header('Location: /admin/colleges_departments');
+            exit;
+        }
+
         try {
             $type = $_POST['type'] ?? '';
             $id = $_POST['id'] ?? '';
 
             if (empty($type) || empty($id)) {
                 $_SESSION['error'] = "Invalid request";
-                header('Location: /admin/colleges_departments'); // CHANGED
+                header('Location: /admin/colleges_departments');
                 exit;
             }
 
@@ -1122,9 +1138,9 @@ class AdminController
                 $college_name = trim($_POST['college_name'] ?? '');
                 $college_code = trim($_POST['college_code'] ?? '');
 
-                if (empty($college_name) || empty($college_code)) {
-                    $_SESSION['error'] = "College name and code are required";
-                    header('Location: /admin/colleges_departments'); // CHANGED
+                if ($error = $this->validateCollegeData($college_name, $college_code)) {
+                    $_SESSION['error'] = $error;
+                    header('Location: /admin/colleges_departments');
                     exit;
                 }
 
@@ -1138,9 +1154,9 @@ class AdminController
                 $program_code = trim($_POST['program_code'] ?? '');
                 $program_type = $_POST['program_type'] ?? 'Major';
 
-                if (empty($department_name) || empty($college_id) || empty($program_name) || empty($program_code)) {
-                    $_SESSION['error'] = "All fields are required";
-                    header('Location: /admin/colleges_departments'); // CHANGED
+                if ($error = $this->validateDepartmentData($department_name, $college_id, $program_name, $program_code)) {
+                    $_SESSION['error'] = $error;
+                    header('Location: /admin/colleges_departments');
                     exit;
                 }
 
@@ -1165,13 +1181,13 @@ class AdminController
                 $_SESSION['success'] = "Department and program updated successfully";
             }
 
-            header('Location: /admin/colleges_departments'); // CHANGED
+            header('Location: /admin/colleges_departments');
             exit;
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("Update college/department error: " . $e->getMessage());
             $_SESSION['error'] = "Failed to update $type";
-            header('Location: /admin/colleges_departments'); // CHANGED
+            header('Location: /admin/colleges_departments');
             exit;
         }
     }

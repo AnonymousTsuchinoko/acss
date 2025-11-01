@@ -564,9 +564,9 @@ $currentUri = $_SERVER['REQUEST_URI'];
     </header>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar flex flex-col" role="navigation" aria-label="Main navigation">
         <!-- Sidebar Header -->
-        <div class="py-6 px-6 flex flex-col items-center justify-center border-b border-gray-700 bg-gray-900">
+        <div class="py-6 px-6 flex flex-col items-center justify-center border-b border-gray-700 bg-gray-900 flex-shrink-0">
             <div class="flex items-center justify-center mb-3">
                 <img src="/assets/logo/main_logo/PRMSUlogo.png" alt="PRMSU Logo" class="h-12">
             </div>
@@ -575,7 +575,7 @@ $currentUri = $_SERVER['REQUEST_URI'];
         </div>
 
         <!-- User Profile Section -->
-        <div class="p-4 border-b border-gray-700 bg-gray-800/70">
+        <div class="p-4 border-b border-gray-700 bg-gray-800/70 flex-shrink-0">
             <div class="flex items-center space-x-3">
                 <?php if (!empty($profilePicture)): ?>
                     <img class="h-12 w-12 rounded-full border-2 border-yellow-400 object-cover shadow-md"
@@ -589,14 +589,14 @@ $currentUri = $_SERVER['REQUEST_URI'];
                     <p class="font-medium text-white truncate"><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></p>
                     <div class="flex items-center text-xs text-yellow-400">
                         <i class="fas fa-circle text-green-500 mr-1 text-xs"></i>
-                        <span>VPAA</span>
+                        <span><?php echo htmlspecialchars($_SESSION['current_role']); ?></span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Navigation -->
-        <nav class="mt-4 px-2" role="navigation">
+        <nav class="mt-4 px-2 flex-grow overflow-y-auto" role="navigation">
             <!-- Dashboard Link -->
             <a href="/admin/dashboard" class="nav-item flex items-center px-4 py-3 text-gray-200 rounded-lg mb-1 hover:text-white transition-all duration-300 <?= strpos($currentUri, '/admin/dashboard') !== false ? 'active-nav bg-gray-800 text-yellow-400' : '' ?>">
                 <i class="fas fa-tachometer-alt w-5 mr-3 <?= strpos($currentUri, '/admin/dashboard') !== false ? 'text-yellow-400' : 'text-gray-400' ?>"></i>
@@ -653,10 +653,10 @@ $currentUri = $_SERVER['REQUEST_URI'];
         </nav>
 
         <!-- Sidebar Footer -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700">
+        <div class="p-4 bg-gray-900 border-t border-gray-700 mt-auto flex-shrink-0">
             <div class="flex items-center justify-between text-xs text-gray-400">
                 <div>
-                    <p>VPAA System</p>
+                    <p>Admin System</p>
                     <p>Version 2.1.0</p>
                 </div>
                 <a href="/admin/system/status" class="text-yellow-400 hover:text-yellow-300 transition-all duration-300">

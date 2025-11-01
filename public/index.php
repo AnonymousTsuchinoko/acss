@@ -29,78 +29,78 @@ function handleAdminRoutes($path)
         case '/admin/dashboard':
             error_log("Routing to AdminController::dashboard");
             $controller->dashboard();
-            break;
+            exit;
         case '/admin/act_logs':
             error_log("Routing to AdminController::activityLogs");
             $controller->activityLogs();
-            break;
+            exit;
         case '/admin/act_logs/load-more':
             error_log("Routing to loadMore");
             $controller->loadMore();
-            break;
+            exit;
         case '/admin/act_logs/generate-pdf':
             error_log("Routing to AdminController::generateActivityPDF");
             $controller->generateActivityPDF();
-            break;
+            exit;
         case '/admin/act_logs/view-pdf':
             error_log("Routing to AdminController::viewActivityPDF");
             $controller->viewActivityPDF();
-            break;
+            exit;
         case '/admin/act_logs/download-pdf':
             error_log("Routing to AdminController::downloadActivityPDF");
             $controller->downloadActivityPDF();
-            break;
+            exit;
         case '/admin/schedule':
             error_log("Routing to AdminController::schedule");
             $controller->mySchedule();
-            break;
+            exit;
         case '/admin/users':
         case '/admin/edit_user':
             error_log("Routing to AdminController::users");
             $controller->manageUsers();
-            break;
+            exit;
         case '/admin/colleges':
         case '/admin/departments':
         case '/admin/colleges_departments':
             error_log("Routing to AdminController::collegesDepartments");
             $controller->collegesDepartments();
-            break;
+            exit;
         case '/admin/colleges_departments/create':
             error_log("Routing to AdminController::createCollegeDepartment");
             $controller->createCollegeDepartment();
-            break;
+            exit;
         case '/admin/colleges_departments/update':
             error_log("Routing to AdminController::update college/departments");
             $controller->updateCollegeDepartment();
-            break;
+            exit;
         case '/admin/classroom':
             error_log("Routing to AdminController::classroom");
             $controller->classroom();
-            break;
+            exit;
         case '/admin/faculty':
             error_log("Routing to AdminController::faculty");
             $controller->faculty();
-            break;
+            exit;
         case '/admin/faculty/create':
             error_log("Routing to AdminController::createFaculty");
             $controller->createFaculty();
-            break;
+            exit;
         case '/admin/schedules':
             error_log("Routing to AdminController::schedules");
             $controller->schedules();
-            break;
+            exit;
         case '/admin/profile':
             error_log("Routing to AdminController::profile");
             $controller->profile();
-            break;
+            exit;
         case '/admin/settings':
             error_log("Routing to AdminController::settings");
             $controller->settings();
-            break;
+            exit;
         case '/admin/database-backup':
             error_log("Routing to AdminController::backupDatabase");
             $controller->databaseBackup();
-            break;
+            exit;
         case '/admin/logout':
             error_log("Routing to AuthController::logout");
             require_once __DIR__ . '/../src/controllers/AuthController.php';
@@ -135,35 +135,35 @@ function handleDirectorRoutes($path)
         case '/director/dashboard':
             error_log("Routing to DirectorController::dashboard");
             $controller->dashboard();
-            break;
+            exit;
         case '/director/schedule':
             error_log("Routing to DirectorController::mySchedule");
             $controller->mySchedule();
-            break;
+            exit;
         case '/director/monitor':
             error_log("Routing to DirectorController::monitoring");
             $controller->monitor();
-            break;
+            exit;
         case '/director/monitor/load-more':
             error_log("Routing to loadMore");
             $controller->loadMore();
-            break;
+            exit;
         case '/director/profile':
             error_log("Routing to DirectorController::profile");
             $controller->profile();
-            break;
+            exit;
         case '/director/schedule_deadline':
             error_log("Routing to DirectorController::setSchedule");
             $controller->setScheduleDeadline();
-            break;
+            exit;
         case '/director/pending-approvals':
             error_log("Routing to DirectorController::pendingApprovalsView");
             $controller->manageSchedule();
-            break;
+            exit;
         case '/director/settings':
             error_log("Routing to DirectorController::settings");
             $controller->settings();
-            break;
+            exit;
         case '/director/logout':
             error_log("Routing to AuthController::logout");
             require_once __DIR__ . '/../src/controllers/AuthController.php';
@@ -189,64 +189,62 @@ function handleDeanRoutes($path)
     switch ($normalizedPath) {
         case '/dean/dashboard':
             $controller->dashboard();
-            break;
+            exit;
         case '/dean/schedule':
             $controller->mySchedule();
-            break;
+            exit;
         case '/dean/manage_schedules':
             $controller->manageSchedule();
-            break;
+            exit;
         case '/dean/approve-teaching-load':
             $controller->approveTeachingLoad();
-            break;
+            exit;
         case '/dean/reject-teaching-load':
             $controller->rejectTeachingLoad();
-            break;
+            exit;
         case '/dean/api/faculty-approval-status':
             $controller->getFacultyApprovalStatus($_GET['facultyId'] ?? null);
             exit; // Add exit here to prevent further execution
-            break;
         case '/dean/api/faculty-schedule':
             $controller->getFacultySchedule($_GET['facultyId'] ?? null);
             exit; // Add exit here to prevent further execution
-            break;
         case '/dean/faculty-teaching-load':
             $controller->facultyTeachingLoad();
-            break;
+            exit;
         case '/dean/manage_department':
             $controller->manageDepartments();
-            break;
+            exit;
         case '/dean/activities':
             $controller->activities();
-            break;
+            exit;
         case '/dean/activities/load-more':
             error_log("Routing to loadMoreActivities");
             $controller->loadMoreActivities();
-            break;
+            exit;
         case '/dean/classroom':
             $controller->classroom();
-            break;
+            exit;
         case '/dean/faculty':
             $controller->faculty();
-            break;
+            exit;
         case '/dean/search':
             $controller->search();
-            break;
+            exit;
         case '/dean/courses':
             $controller->courses();
-            break;
+            exit;
         case '/dean/curriculum':
             $controller->curriculum();
-            break;
+            exit;
         case '/dean/profile':
             $controller->profile();
-            break;
+            exit;
         case '/dean/profile/search_courses':
             $controller->searchCourses();
             exit;
         case '/dean/settings':
             $controller->settings();
-            break;
+            exit;
         case '/dean/logout':
             error_log("Routing to AuthController::logout");
             require_once __DIR__ . '/../src/controllers/AuthController.php';
@@ -293,7 +291,7 @@ function handleChairRoutes($path)
         case '/chair/delete-all-schedules':
             error_log("Routing to ChairController::delete all schedules");
             $controller->deleteAllSchedules();
-            break;
+            exit;
         case '/chair/schedule_history':
             error_log("Routing to ChairController::scheduleHistory");
             $controller->viewScheduleHistory();
@@ -321,7 +319,7 @@ function handleChairRoutes($path)
         case '/chair/checkCourseCode':
             error_log("Routing to ChairController::checkCourseCode");
             $controller->checkCourseCode();
-            break;
+            exit;
         case '/chair/curriculum':
             error_log("Routing to ChairController::curriculum");
             $controller->curriculum();
@@ -425,10 +423,10 @@ if (in_array($path, $publicRoutes)) {
     switch ($path) {
         case 'login':
             $controller->login();
-            break;
+            exit;
         case 'register':
             $controller->register();
-            break;
+            exit;
         case 'forgot-password':
             $controller->forgotPassword();
             break;
@@ -438,13 +436,14 @@ if (in_array($path, $publicRoutes)) {
             } else {
                 http_response_code(405);
                 echo "Method Not Allowed";
+                exit;
             }
-            break;
+            exit;
         case '':
         case 'home':
             require_once __DIR__ . '/../src/controllers/PublicController.php';
             (new PublicController())->showHomepage();
-            break;
+            exit;
         case 'public/search':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once __DIR__ . '/../src/controllers/PublicController.php';
@@ -452,8 +451,9 @@ if (in_array($path, $publicRoutes)) {
             } else {
                 http_response_code(405);
                 echo "Method Not Allowed";
+                exit;
             }
-            break;
+            exit;
         case 'public/departments':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once __DIR__ . '/../src/controllers/PublicController.php';
@@ -461,8 +461,9 @@ if (in_array($path, $publicRoutes)) {
             } else {
                 http_response_code(405);
                 echo "Method Not Allowed";
+                exit;
             }
-            break;
+            exit;
         case 'public/sections':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once __DIR__ . '/../src/controllers/PublicController.php';
@@ -470,12 +471,13 @@ if (in_array($path, $publicRoutes)) {
             } else {
                 http_response_code(405);
                 echo "Method Not Allowed";
+                exit;
             }
             break;
         default:
             http_response_code(404);
             echo "Page not found";
-            break;
+            exit;
     }
     exit;
 }
@@ -626,22 +628,22 @@ error_log("Routing for current_role: $currentRole");
 switch (strtolower($currentRole)) {
     case 'admin':
         handleAdminRoutes($path);
-        break;
+        exit;
     case 'vpaa':
         handleAdminRoutes($path); // VPAA uses admin routes
-        break;
+        exit;
     case 'd.i':
         handleDirectorRoutes($path);
-        break;
+        exit;
     case 'dean':
         handleDeanRoutes($path);
-        break;
+        exit;
     case 'chair':
         handleChairRoutes($path);
-        break;
+        exit;
     case 'faculty':
         handleFacultyRoutes($path);
-        break;
+        exit;
     default:
         error_log("Unknown current_role: $currentRole");
         http_response_code(403);

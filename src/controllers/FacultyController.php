@@ -29,6 +29,7 @@ class FacultyController
         if (!isset($_SESSION['user_id']) || !isset($_SESSION['role_id']) || $_SESSION['role_id'] != 6) {
             error_log("restrictToFaculty: Redirecting to login due to unauthorized access");
             header('Location: /login?error=Unauthorized access');
+        exit;
             exit;
         }
     }
@@ -549,6 +550,7 @@ class FacultyController
 
                     error_log("submitScheduleRequest: Schedule request submitted successfully");
                     header('Location: /faculty/schedule/requests?success=Schedule request submitted successfully');
+            exit;
                     exit;
                 } else {
                     error_log("submitScheduleRequest: Validation errors - " . implode(", ", $errors));

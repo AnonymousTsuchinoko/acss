@@ -843,7 +843,7 @@ $currentRole = $_SESSION['current_role'] ?? ($_SESSION['roles'][0] ?? null);
         </nav>
 
         <!-- Sidebar Footer -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700">
+        <div class="p-4 bg-gray-900 border-t border-gray-700 mt-auto flex-shrink-0">
             <div class="flex items-center justify-between text-xs text-gray-400">
                 <div>
                     <p>Program Chair System</p>
